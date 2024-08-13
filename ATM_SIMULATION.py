@@ -1,70 +1,80 @@
-class BankAccount:
-    def __init__(self, initial_balance):
-        self.balance = initial_balance
+import time
 
-    def get_balance(self):
-        return self.balance
+print("Please insert your CARD")
+time.sleep(2)  # Card reading time
 
-    def deposit(self, amount):
-        if amount > 0:
-            self.balance += amount
-            print(f"Deposit successful. New balance: ${self.balance:.2f}")
-        else:
-            print("Invalid deposit amount.")
+# Initial details
+password = 1234 # Default PIN, can be changed
+balance = 5000
+transaction_history = []  # To store transaction details
 
-    def withdraw(self, amount):
-        if amount > 0 and amount <= self.balance:
-            self.balance -= amount
-            print(f"Withdrawal successful. New balance: ${self.balance:.2f}")
-            return True
-        else:
-            print("Insufficient balance or invalid withdrawal amount.")
-            return False
-    
+# Function to display menu options
+def display_menu():
+    print("""
+    ==========================================================
+    1 == Balance Inquiry
+    2 == Withdraw Balance
+    3 == Deposit Balance
+    4 == Change PIN
+    5 == Transaction History
+    6 == Exit
+    ==========================================================""")
 
-class ATM:
-    def __init__(self, account):
-        self.user_account = account
+# Function to add transactions to history
+def add_transaction(transaction):
+    transaction_history.append(transaction)
 
-    def display_menu(self):
-        print("\nATM Menu:")
-        print("1. Check Balance")
-        print("2. Deposit Funds")
-        print("3. Withdraw Funds")
-        print("4. Exit")
+# Takes pin input
+pin = int(input("Enter your ATM PIN: "))
 
-    def run(self):
-        choice = 0
-
-        while choice != 4:
-            self.display_menu()
-            choice = int(input("Enter your choice (1-4): "))
-
-            if choice == 1:
-                self.check_balance()
-            elif choice == 2:
-                self.deposit_funds()
-            elif choice == 3:
-                self.withdraw_funds()
-            elif choice == 4:
-                print("Thank you for using the ATM!")
+if pin == password:
+    while True:
+        display_menu()
+        try:
+            option = int(input("Please enter your choice: "))
+        except ValueError:
+            print("Please enter a valid option.")
+            continue
+        
+        if option == 1:
+            print(f"Your current balance is {balance}")
+        
+        elif option == 2:
+            withdraw_amount = int(input("Please enter withdraw amount: "))
+            if withdraw_amount > balance:
+                print("Insufficient balance.")
             else:
-                print("Invalid choice. Please enter a valid option.")
+                balance -= withdraw_amount
+                print(f"{withdraw_amount} is debited from your account.")
+                print(f"Your updated balance is {balance}")
+                add_transaction(f"Withdraw: -{withdraw_amount}")
 
-    def check_balance(self):
-        balance = self.user_account.get_balance()
-        print(f"Your account balance: ${balance:.2f}")
+        elif option == 3:
+            deposit_amount = int(input("Please enter deposit amount: "))
+            balance += deposit_amount
+            print(f"{deposit_amount} is credited to your account.")
+            print(f"Your updated balance is {balance}")
+            add_transaction(f"Deposit: +{deposit_amount}")
 
-    def deposit_funds(self):
-        amount = float(input("Enter the deposit amount: $"))
-        self.user_account.deposit(amount)
+        elif option == 4:
+            new_pin = int(input("Enter your new PIN: "))
+            password = new_pin
+            print("Your PIN has been successfully changed.")
 
-    def withdraw_funds(self):
-        amount = float(input("Enter the withdrawal amount: $"))
-        self.user_account.withdraw(amount)
+        elif option == 5:
+            if transaction_history:
+                print("Transaction History:")
+                for transaction in transaction_history:
+                    print(transaction)
+            else:
+                print("No transactions yet.")
 
+        elif option == 6:
+             # Exit the program
+            print("Thank you for using the ATM. Have a great day!")
+            break
 
-if __name__ == "__main__":
-    user_account = BankAccount(0)
-    atm = ATM(user_account)
-    atm.run()
+        else:
+            print("Invalid option. Please try again.")
+else:
+    print("Wrong PIN, Please try again.")
